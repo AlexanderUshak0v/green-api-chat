@@ -1,5 +1,5 @@
 import { makeAutoObservable, runInAction } from 'mobx'
-import { isUnauthorized, setCredentials } from '@/api/green-api/client'
+import { isUnauthorized, isUnknownInstance, setCredentials } from '@/api/green-api/client'
 import { getStateInstance } from '@/api/green-api/account/getStateInstance'
 import type { Credentials } from '@/models/Credentials'
 
@@ -26,6 +26,11 @@ export class AuthStore {
   }
 
   async login(credentials: Credentials) {
+    if (!/^\d+$/.test(credentials.idInstance)) {
+      this.error = 'idInstance должен состоять только из цифр'
+      return
+    }
+
     this.isLoading = true
     this.error = ''
     setCredentials(credentials)
@@ -43,9 +48,13 @@ export class AuthStore {
       })
     } catch (error) {
       runInAction(() => {
-        this.error = isUnauthorized(error)
-          ? 'Неверный idInstance или apiTokenInstance'
-          : 'Не удалось подключиться к GREEN-API'
+        if (isUnauthorized(error)) {
+          this.error = 'Неверный idInstance или apiTokenInstance'
+        } else if (isUnknownInstance(error)) {
+          this.error = 'Неверный idInstance'
+        } else {
+          this.error = 'Не удалось подключиться к GREEN-API'
+        }
       })
     } finally {
       runInAction(() => {

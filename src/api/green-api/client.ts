@@ -17,3 +17,8 @@ export const withToken = (method: string) => `/${method}/${token}`
 
 export const isUnauthorized = (error: unknown) =>
   axios.isAxiosError(error) && error.response?.status === 401
+
+// На несуществующий idInstance GREEN-API отвечает 403 без CORS-заголовков,
+// поэтому браузер не отдаёт ответ и axios видит ошибку без response
+export const isUnknownInstance = (error: unknown) =>
+  axios.isAxiosError(error) && !error.response && navigator.onLine
