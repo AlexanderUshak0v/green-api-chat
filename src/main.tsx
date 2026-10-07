@@ -1,10 +1,17 @@
+import { AdaptivityProvider, AppRoot, ConfigProvider } from '@vkontakte/vkui'
+import '@vkontakte/vkui/dist/vkui.css'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
-import './index.css'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <App />
+    <ConfigProvider colorScheme="dark">
+      <AdaptivityProvider>
+        <AppRoot>
+          <App />
+        </AppRoot>
+      </AdaptivityProvider>
+    </ConfigProvider>
   </StrictMode>,
 )

@@ -22,11 +22,12 @@ export class ChatStore {
     if (!this.chats.some((chat) => chat.phone === phone)) {
       this.chats.unshift({ phone, telegramId: null, messages: [] })
     }
-    this.selectedPhone = phone
+    this.selectChat(phone)
   }
 
   selectChat(phone: string | null) {
     this.selectedPhone = phone
+    this.sendError = ''
   }
 
   setOnline(isOnline: boolean) {
