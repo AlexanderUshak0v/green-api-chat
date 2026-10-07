@@ -1,0 +1,31 @@
+import { greenApi, withToken } from './client'
+
+// Сколько секунд сервер ждёт новое уведомление, прежде чем вернуть null
+const RECEIVE_TIMEOUT = 20
+
+export interface NotificationDto {
+  receiptId: number
+  body: {
+    typeWebhook: string
+    idMessage: string
+    timestamp: number
+    senderData?: {
+      chatId: string
+      senderPhoneNumber?: number
+    }
+    messageData?: {
+      typeMessage: string
+      textMessageData?: { textMessage: string }
+      extendedTextMessageData?: { text: string }
+    }
+  }
+}
+
+export const receiveNotification = async (signal: AbortSignal) => {
+  const { data } = await greenApi.get<NotificationDto | null>(withToken('receiveNotification'), {
+    params: { receiveTimeout: RECEIVE_TIMEOUT },
+    timeout: (RECEIVE_TIMEOUT + 10) * 1000,
+    signal,
+  })
+  return data
+}
