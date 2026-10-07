@@ -1,5 +1,6 @@
 import { makeAutoObservable, runInAction } from 'mobx'
 import { isUnauthorized, isUnknownInstance, setCredentials } from '@/api/green-api/client'
+import { getSettings } from '@/api/green-api/account/getSettings'
 import { getStateInstance } from '@/api/green-api/account/getStateInstance'
 import type { Credentials } from '@/models/Credentials'
 
@@ -37,13 +38,16 @@ export class AuthStore {
 
     try {
       const state = await getStateInstance()
+      const settingsError = state === 'authorized' ? await this._checkSettings() : ''
       runInAction(() => {
-        if (state === 'authorized') {
-          this.credentials = credentials
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(credentials))
-        } else {
+        if (state !== 'authorized') {
           this.error =
             'Telegram не подключён к инстансу. Отсканируйте QR-код в личном кабинете GREEN-API'
+        } else if (settingsError) {
+          this.error = settingsError
+        } else {
+          this.credentials = credentials
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(credentials))
         }
       })
     } catch (error) {
@@ -61,6 +65,26 @@ export class AuthStore {
         this.isLoading = false
       })
     }
+  }
+
+  // Без этих настроек уведомления не попадут в очередь receiveNotification.
+  // Эхо отправки нужно, чтобы узнать Telegram ID собеседника, скрывшего номер
+  private async _checkSettings() {
+    const settings = await getSettings()
+    const steps: string[] = []
+    if (settings.webhookUrl) {
+      steps.push('очистите «Адрес отправки уведомлений (URL)»')
+    }
+    if (settings.incomingWebhook !== 'yes') {
+      steps.push('включите «Получать уведомления о входящих сообщениях и файлах»')
+    }
+    if (settings.outgoingAPIMessageWebhook !== 'yes') {
+      steps.push('включите «Получать уведомления о сообщениях, отправленных с API»')
+    }
+    if (steps.length === 0) {
+      return ''
+    }
+    return `Сообщения не будут приходить. В личном кабинете GREEN-API в настройках уведомлений инстанса ${steps.join(', ')}`
   }
 
   logout(error = '') {
