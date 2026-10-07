@@ -31,11 +31,16 @@ export const ChatPage = observer(() => {
   return (
     <SplitLayout>
       {(isDesktop || !chat) && (
-        <SplitCol width={360} maxWidth={360} stretchedOnMobile>
+        <SplitCol width={360} minWidth={360} maxWidth={360} stretchedOnMobile={!isDesktop}>
           <Panel>
             <PanelHeader
+              delimiter="separator"
               after={
-                <PanelHeaderButton label="Выйти" onClick={() => authStore.logout()}>
+                <PanelHeaderButton
+                  aria-label="Выйти"
+                  title="Выйти"
+                  onClick={() => authStore.logout()}
+                >
                   <Icon28DoorArrowRightOutline />
                 </PanelHeaderButton>
               }
@@ -49,7 +54,7 @@ export const ChatPage = observer(() => {
       )}
 
       {(isDesktop || chat) && (
-        <SplitCol stretchedOnMobile>
+        <SplitCol width="100%" stretchedOnMobile={!isDesktop}>
           {chat ? (
             <ChatWindow chat={chat} />
           ) : (

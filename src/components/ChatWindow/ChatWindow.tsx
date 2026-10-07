@@ -1,7 +1,10 @@
+import { Icon20UserOutline } from '@vkontakte/icons'
 import {
+  Avatar,
   Panel,
   PanelHeader,
   PanelHeaderBack,
+  PanelHeaderContent,
   useAdaptivityWithJSMediaQueries,
 } from '@vkontakte/vkui'
 import { observer } from 'mobx-react-lite'
@@ -23,14 +26,16 @@ export const ChatWindow = observer(({ chat }: Props) => {
   return (
     <Panel className={styles.window}>
       <PanelHeader
+        delimiter="separator"
         before={!isDesktop && <PanelHeaderBack onClick={() => chatStore.selectChat(null)} />}
       >
-        {formatPhone(chat.phone)}
+        <PanelHeaderContent
+          before={<Avatar size={36} fallbackIcon={<Icon20UserOutline />} />}
+          subtitle={!chatStore.isOnline && 'Нет соединения…'}
+        >
+          {formatPhone(chat.phone)}
+        </PanelHeaderContent>
       </PanelHeader>
-
-      {!chatStore.isOnline && (
-        <div className={styles.offline}>Нет соединения. Переподключаемся…</div>
-      )}
 
       <MessageList messages={chat.messages} />
       <MessageInput key={chat.phone} />

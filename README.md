@@ -1,6 +1,6 @@
 # GREEN-API Chat
 
-Веб-чат для отправки и получения текстовых сообщений в Telegram через [GREEN-API](https://green-api.com/telegram). Внешний вид повторяет тёмную тему [web.max.ru](https://web.max.ru/), интерфейс собран на [VKUI](https://github.com/VKCOM/VKUI), открытой дизайн-системе VK.
+Веб-чат для отправки и получения текстовых сообщений в Telegram через [GREEN-API](https://green-api.com/telegram). Раскладка повторяет тёмную тему [web.max.ru](https://web.max.ru/), акцентный цвет взят у GREEN-API. Интерфейс собран на [VKUI](https://github.com/VKCOM/VKUI), открытой дизайн-системе VK.
 
 Тестовое задание на позицию «Фронтенд разработчик React». В задании основной мессенджер — MAX, но аккаунта MAX у меня нет, поэтому, как допускает задание, сделал на Telegram.
 

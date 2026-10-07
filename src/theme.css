@@ -1,0 +1,18 @@
+/* Акцентные токены VKUI в фирменном зелёном GREEN-API */
+.vkui--vkBase--dark {
+  --vkui--color_background_accent: #3b9702;
+  --vkui--color_background_accent--hover: #2d7301;
+  --vkui--color_background_accent--active: #2d7301;
+  --vkui--color_background_accent_alternative: #3b9702;
+  --vkui--color_background_accent_alternative--hover: #2d7301;
+  --vkui--color_background_accent_alternative--active: #2d7301;
+  --vkui--color_text_accent: #4fb80e;
+  --vkui--color_text_accent--hover: #45a30c;
+  --vkui--color_text_accent--active: #45a30c;
+  --vkui--color_icon_accent: #4fb80e;
+  --vkui--color_icon_accent--hover: #45a30c;
+  --vkui--color_icon_accent--active: #45a30c;
+  --vkui--color_stroke_accent: #3b9702;
+  --vkui--color_stroke_accent--hover: #2d7301;
+  --vkui--color_stroke_accent--active: #2d7301;
+}

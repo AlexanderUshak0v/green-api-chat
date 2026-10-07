@@ -1,4 +1,5 @@
-import { Button, Flex, FormItem, Input } from '@vkontakte/vkui'
+import { Icon24ArrowRightOutline } from '@vkontakte/icons'
+import { FormItem, IconButton, Input } from '@vkontakte/vkui'
 import { useState, type FormEvent } from 'react'
 import { useStore } from '@/stores/RootStoreContext'
 import { normalizePhone } from '@/utils/phone'
@@ -23,21 +24,19 @@ export const NewChatForm = () => {
   return (
     <form onSubmit={handleSubmit}>
       <FormItem status={error ? 'error' : 'default'} bottom={error}>
-        <Flex gap="m" noWrap>
-          <Flex.Item flex="grow">
-            <Input
-              type="tel"
-              placeholder="Номер телефона"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-            />
-          </Flex.Item>
-          <Flex.Item flex="content">
-            <Button type="submit" size="l" appearance="accent-invariable" disabled={!phone.trim()}>
-              Начать чат
-            </Button>
-          </Flex.Item>
-        </Flex>
+        <Input
+          type="tel"
+          placeholder="Новый чат по номеру телефона"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+          after={
+            phone.trim() && (
+              <IconButton type="submit" label="Начать чат">
+                <Icon24ArrowRightOutline />
+              </IconButton>
+            )
+          }
+        />
       </FormItem>
     </form>
   )
