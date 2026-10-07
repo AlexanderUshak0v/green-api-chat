@@ -15,6 +15,7 @@ export const ChatListItem = observer(({ chat }: Props) => {
 
   return (
     <SimpleCell
+      borderRadiusMode="inherit"
       before={<Avatar size={48} fallbackIcon={<Icon28UserOutline />} />}
       subtitle={lastMessage && (lastMessage.text ?? 'Сообщение не поддерживается')}
       activated={chat.phone === chatStore.selectedPhone}

@@ -14,6 +14,7 @@ import { ChatList } from '@/components/ChatList/ChatList'
 import { ChatWindow } from '@/components/ChatWindow/ChatWindow'
 import { NewChatForm } from '@/components/NewChatForm/NewChatForm'
 import { useStore } from '@/stores/RootStoreContext'
+import styles from './ChatPage.module.css'
 
 export const ChatPage = observer(() => {
   const { authStore, chatStore, notificationService } = useStore()
@@ -31,10 +32,16 @@ export const ChatPage = observer(() => {
   return (
     <SplitLayout>
       {(isDesktop || !chat) && (
-        <SplitCol width={360} minWidth={360} maxWidth={360} stretchedOnMobile={!isDesktop}>
+        <SplitCol
+          className={styles.sidebar}
+          width={360}
+          minWidth={360}
+          maxWidth={360}
+          stretchedOnMobile={!isDesktop}
+        >
           <Panel>
             <PanelHeader
-              delimiter="separator"
+              delimiter="none"
               after={
                 <PanelHeaderButton
                   aria-label="Выйти"
