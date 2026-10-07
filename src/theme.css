@@ -1,18 +1,55 @@
-/* Акцентные токены VKUI в фирменном зелёном GREEN-API */
-.vkui--vkBase--dark {
-  --vkui--color_background_accent: #3b9702;
-  --vkui--color_background_accent--hover: #2d7301;
-  --vkui--color_background_accent--active: #2d7301;
-  --vkui--color_background_accent_alternative: #3b9702;
-  --vkui--color_background_accent_alternative--hover: #2d7301;
-  --vkui--color_background_accent_alternative--active: #2d7301;
-  --vkui--color_text_accent: #4fb80e;
-  --vkui--color_text_accent--hover: #45a30c;
-  --vkui--color_text_accent--active: #45a30c;
-  --vkui--color_icon_accent: #4fb80e;
-  --vkui--color_icon_accent--hover: #45a30c;
-  --vkui--color_icon_accent--active: #45a30c;
-  --vkui--color_stroke_accent: #3b9702;
-  --vkui--color_stroke_accent--hover: #2d7301;
-  --vkui--color_stroke_accent--active: #2d7301;
+/* Палитра GREEN-API поверх тёмной темы VKUI */
+:root {
+  color-scheme: dark;
+  --green-brand: #3b9702;
+  --green-accent: #66ff33;
+  --green-text: #ffffff;
+  --green-text-secondary: #b3b3b3;
+  --green-background: #141414;
+  --green-surface: #191919;
+  --green-surface-raised: #242424;
+  --green-border: #333333;
+  --green-message-outgoing: #285b12;
+}
+
+html,
+body {
+  background: var(--green-background);
+}
+
+.vkui--vkBase--dark,
+.vkui--vkIOS--dark {
+  --vkui--color_background: var(--green-background);
+  --vkui--color_background_content: var(--green-surface);
+  --vkui--color_background_secondary: var(--green-surface-raised);
+  --vkui--color_background_accent: var(--green-brand);
+  --vkui--color_background_accent--hover: #348502;
+  --vkui--color_background_accent--active: #2c7102;
+
+  --vkui--color_text_primary: var(--green-text);
+  --vkui--color_text_secondary: var(--green-text-secondary);
+  --vkui--color_text_subhead: var(--green-text-secondary);
+
+  --vkui--color_icon_primary: var(--green-text);
+  --vkui--color_icon_secondary: var(--green-text-secondary);
+  --vkui--color_icon_tertiary: #8c8c8c;
+  --vkui--color_icon_accent: var(--green-accent);
+
+  --vkui--color_field_background: var(--green-surface-raised);
+  --vkui--color_field_border_alpha: var(--green-border);
+  --vkui--color_field_border_alpha--hover: var(--green-border);
+  --vkui--color_stroke_accent: var(--green-accent);
+  --vkui--color_separator_primary: var(--green-border);
+  --vkui--color_transparent--hover: color-mix(in srgb, var(--green-accent) 8%, transparent);
+  --vkui--color_transparent--active: color-mix(in srgb, var(--green-accent) 14%, transparent);
+}
+
+/* Рамка поля не меняется при фокусе; ошибка остаётся красной, она берёт другой токен */
+.vkuiFormField__host {
+  --vkui--color_stroke_accent: var(--green-border);
+}
+
+::selection {
+  color: var(--green-text);
+  background: #254800;
 }

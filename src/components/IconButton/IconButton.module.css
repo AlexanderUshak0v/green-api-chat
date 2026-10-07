@@ -1,0 +1,20 @@
+.button {
+  --vkui_internal--outline: none;
+  color: var(--vkui--color_icon_tertiary);
+  background: transparent;
+  transition: color 150ms ease;
+}
+
+.button :global(.vkuiIcon) {
+  color: inherit;
+}
+
+/* Классы hover, focus и active VKUI ставит сам, когда кнопка в этом состоянии */
+.button.hover,
+.button.focus {
+  color: var(--vkui--color_icon_primary);
+}
+
+.button.active {
+  color: var(--vkui--color_icon_secondary);
+}

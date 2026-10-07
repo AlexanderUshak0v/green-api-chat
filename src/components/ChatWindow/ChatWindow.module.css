@@ -1,5 +1,11 @@
 .window {
+  --chat-gutter: max(16px, calc((100% - 760px) / 2));
   display: flex;
   flex-direction: column;
   height: 100dvh;
+}
+
+/* Линия на всю ширину вместо штатного разделителя VKUI, который короче шапки */
+.header {
+  box-shadow: 0 1px 0 var(--vkui--color_separator_primary);
 }

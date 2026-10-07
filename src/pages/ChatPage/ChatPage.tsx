@@ -1,8 +1,7 @@
-import { Icon28DoorArrowRightOutline, Icon56MessageOutline } from '@vkontakte/icons'
+import { Icon28DoorArrowRightOutline, Icon56MessagesOutline } from '@vkontakte/icons'
 import {
   Panel,
   PanelHeader,
-  PanelHeaderButton,
   Placeholder,
   SplitCol,
   SplitLayout,
@@ -12,14 +11,18 @@ import { observer } from 'mobx-react-lite'
 import { useEffect } from 'react'
 import { ChatList } from '@/components/ChatList/ChatList'
 import { ChatWindow } from '@/components/ChatWindow/ChatWindow'
+import { IconButton } from '@/components/IconButton/IconButton'
 import { NewChatForm } from '@/components/NewChatForm/NewChatForm'
 import { useStore } from '@/stores/RootStoreContext'
 import styles from './ChatPage.module.css'
+
+const SIDEBAR_WIDTH = 360
 
 export const ChatPage = observer(() => {
   const { authStore, chatStore, notificationService } = useStore()
   const { isDesktop } = useAdaptivityWithJSMediaQueries()
   const chat = chatStore.selectedChat
+  const hasChats = chatStore.chats.length > 0
 
   useEffect(() => {
     notificationService.start()
@@ -34,22 +37,18 @@ export const ChatPage = observer(() => {
       {(isDesktop || !chat) && (
         <SplitCol
           className={styles.sidebar}
-          width={360}
-          minWidth={360}
-          maxWidth={360}
+          width={SIDEBAR_WIDTH}
+          minWidth={SIDEBAR_WIDTH}
+          maxWidth={SIDEBAR_WIDTH}
           stretchedOnMobile={!isDesktop}
         >
           <Panel>
             <PanelHeader
               delimiter="none"
               after={
-                <PanelHeaderButton
-                  aria-label="Выйти"
-                  title="Выйти"
-                  onClick={() => authStore.logout()}
-                >
+                <IconButton label="Выйти" title="Выйти" onClick={() => authStore.logout()}>
                   <Icon28DoorArrowRightOutline />
-                </PanelHeaderButton>
+                </IconButton>
               }
             >
               Чаты
@@ -61,13 +60,16 @@ export const ChatPage = observer(() => {
       )}
 
       {(isDesktop || chat) && (
-        <SplitCol width="100%" stretchedOnMobile={!isDesktop}>
+        <SplitCol className={styles.chat} width="100%" stretchedOnMobile={!isDesktop}>
           {chat ? (
             <ChatWindow chat={chat} />
           ) : (
-            <Panel centered>
-              <Placeholder icon={<Icon56MessageOutline />}>
-                Выберите чат или начните новый
+            <Panel centered disableBackground>
+              <Placeholder
+                icon={<Icon56MessagesOutline />}
+                title={hasChats ? 'Выберите чат' : 'Чатов пока нет'}
+              >
+                {hasChats ? 'Или введите номер, чтобы начать новый' : 'Введите номер, чтобы начать'}
               </Placeholder>
             </Panel>
           )}

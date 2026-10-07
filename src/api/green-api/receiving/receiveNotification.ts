@@ -11,7 +11,6 @@ export type NotificationDto = {
     timestamp: number
     senderData?: {
       chatId: string
-      senderPhoneNumber?: number
     }
     messageData?: {
       typeMessage: string

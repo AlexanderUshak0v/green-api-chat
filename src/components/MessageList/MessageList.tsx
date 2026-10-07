@@ -9,6 +9,9 @@ type Props = {
   messages: Message[]
 }
 
+const sameSender = (message: Message, neighbour?: Message) =>
+  neighbour?.isOutgoing === message.isOutgoing
+
 export const MessageList = observer(({ messages }: Props) => {
   const bottomRef = useRef<HTMLDivElement>(null)
 
@@ -20,8 +23,13 @@ export const MessageList = observer(({ messages }: Props) => {
     <div className={styles.list}>
       {messages.length === 0 && <Placeholder stretched>Сообщений пока нет</Placeholder>}
 
-      {messages.map((message) => (
-        <MessageBubble key={message.id} message={message} />
+      {messages.map((message, index) => (
+        <MessageBubble
+          key={message.id}
+          message={message}
+          joinsPrevious={sameSender(message, messages[index - 1])}
+          joinsNext={sameSender(message, messages[index + 1])}
+        />
       ))}
 
       <div ref={bottomRef} />

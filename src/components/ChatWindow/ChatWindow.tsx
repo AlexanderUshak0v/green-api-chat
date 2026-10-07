@@ -1,13 +1,14 @@
-import { Icon20UserOutline } from '@vkontakte/icons'
+import { Icon28ArrowLeftOutline } from '@vkontakte/icons'
 import {
-  Avatar,
   Panel,
   PanelHeader,
-  PanelHeaderBack,
   PanelHeaderContent,
+  Text,
   useAdaptivityWithJSMediaQueries,
 } from '@vkontakte/vkui'
 import { observer } from 'mobx-react-lite'
+import { ChatAvatar } from '@/components/ChatAvatar/ChatAvatar'
+import { IconButton } from '@/components/IconButton/IconButton'
 import { MessageInput } from '@/components/MessageInput/MessageInput'
 import { MessageList } from '@/components/MessageList/MessageList'
 import type { Chat } from '@/models/Chat'
@@ -24,21 +25,28 @@ export const ChatWindow = observer(({ chat }: Props) => {
   const { isDesktop } = useAdaptivityWithJSMediaQueries()
 
   return (
-    <Panel className={styles.window}>
+    <Panel className={styles.window} disableBackground>
       <PanelHeader
-        delimiter="separator"
-        before={!isDesktop && <PanelHeaderBack onClick={() => chatStore.selectChat(null)} />}
+        className={styles.header}
+        delimiter="none"
+        before={
+          !isDesktop && (
+            <IconButton label="Назад" onClick={() => chatStore.selectChat(null)}>
+              <Icon28ArrowLeftOutline />
+            </IconButton>
+          )
+        }
       >
         <PanelHeaderContent
-          before={<Avatar size={36} fallbackIcon={<Icon20UserOutline />} />}
+          before={<ChatAvatar size={36} />}
           subtitle={!chatStore.isOnline && 'Нет соединения…'}
         >
-          {formatPhone(chat.phone)}
+          <Text weight="1">{formatPhone(chat.phone)}</Text>
         </PanelHeaderContent>
       </PanelHeader>
 
       <MessageList messages={chat.messages} />
-      <MessageInput key={chat.phone} />
+      <MessageInput key={chat.chatId} />
     </Panel>
   )
 })

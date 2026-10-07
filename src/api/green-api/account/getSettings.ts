@@ -3,7 +3,6 @@ import { greenApi, withToken } from '../client'
 type SettingsDto = {
   webhookUrl: string
   incomingWebhook: 'yes' | 'no'
-  outgoingAPIMessageWebhook: 'yes' | 'no'
 }
 
 export const getSettings = async () => {

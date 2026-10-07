@@ -1,5 +1,8 @@
-/* Сайдбар — отдельная поверхность цвета шапки, как в MAX: шапка не выглядит висящей полосой */
 .sidebar {
   --vkui--color_background: var(--vkui--color_background_content);
   border-right: 1px solid var(--vkui--color_separator_primary);
+}
+
+.chat {
+  background: var(--vkui--color_background) url('@/assets/chat-pattern.svg') 0 0 / 240px;
 }

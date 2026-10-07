@@ -36,55 +36,46 @@ export class AuthStore {
     this.error = ''
     setCredentials(credentials)
 
+    const error = await this._verifyInstance()
+    runInAction(() => {
+      this.isLoading = false
+      this.error = error
+      if (!error) {
+        this.credentials = credentials
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(credentials))
+      }
+    })
+  }
+
+  // Текст ошибки или пустая строка, если инстанс готов к работе
+  private async _verifyInstance() {
     try {
-      const state = await getStateInstance()
-      const settingsError = state === 'authorized' ? await this._checkSettings() : ''
-      runInAction(() => {
-        if (state !== 'authorized') {
-          this.error =
-            'Telegram не подключён к инстансу. Отсканируйте QR-код в личном кабинете GREEN-API'
-        } else if (settingsError) {
-          this.error = settingsError
-        } else {
-          this.credentials = credentials
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(credentials))
-        }
-      })
+      if ((await getStateInstance()) !== 'authorized') {
+        return 'Telegram не подключён к инстансу. Отсканируйте QR-код в личном кабинете GREEN-API'
+      }
+      return await this._checkSettings()
     } catch (error) {
-      runInAction(() => {
-        if (isUnauthorized(error)) {
-          this.error = 'Неверный idInstance или apiTokenInstance'
-        } else if (isUnknownInstance(error)) {
-          this.error = 'Неверный idInstance'
-        } else {
-          this.error = 'Не удалось подключиться к GREEN-API'
-        }
-      })
-    } finally {
-      runInAction(() => {
-        this.isLoading = false
-      })
+      if (isUnauthorized(error)) {
+        return 'Неверный idInstance или apiTokenInstance'
+      }
+      return isUnknownInstance(error)
+        ? 'Неверный idInstance'
+        : 'Не удалось подключиться к GREEN-API'
     }
   }
 
-  // Без этих настроек уведомления не попадут в очередь receiveNotification.
-  // Эхо отправки нужно, чтобы узнать Telegram ID собеседника, скрывшего номер
+  // Без этих настроек входящие сообщения не попадут в очередь receiveNotification
   private async _checkSettings() {
     const settings = await getSettings()
-    const steps: string[] = []
-    if (settings.webhookUrl) {
-      steps.push('очистите «Адрес отправки уведомлений (URL)»')
-    }
-    if (settings.incomingWebhook !== 'yes') {
-      steps.push('включите «Получать уведомления о входящих сообщениях и файлах»')
-    }
-    if (settings.outgoingAPIMessageWebhook !== 'yes') {
-      steps.push('включите «Получать уведомления о сообщениях, отправленных с API»')
-    }
-    if (steps.length === 0) {
-      return ''
-    }
-    return `Сообщения не будут приходить. В личном кабинете GREEN-API в настройках уведомлений инстанса ${steps.join(', ')}`
+    const steps = [
+      settings.webhookUrl && 'очистите «Адрес отправки уведомлений (URL)»',
+      settings.incomingWebhook !== 'yes' &&
+        'включите «Получать уведомления о входящих сообщениях и файлах»',
+    ].filter(Boolean)
+
+    return steps.length
+      ? `Сообщения не будут приходить. В личном кабинете GREEN-API в настройках уведомлений инстанса ${steps.join(', ')}`
+      : ''
   }
 
   logout(error = '') {

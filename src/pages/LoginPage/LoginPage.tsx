@@ -1,20 +1,21 @@
 import { Icon56MessagesOutline } from '@vkontakte/icons'
 import { Button, FormItem, FormStatus, Input, Placeholder } from '@vkontakte/vkui'
 import { observer } from 'mobx-react-lite'
-import { useState, type FormEvent } from 'react'
+import type { FormEvent } from 'react'
+import type { Credentials } from '@/models/Credentials'
 import { useStore } from '@/stores/RootStoreContext'
 import styles from './LoginPage.module.css'
 
 export const LoginPage = observer(() => {
   const { authStore } = useStore()
-  const [idInstance, setIdInstance] = useState('')
-  const [apiTokenInstance, setApiTokenInstance] = useState('')
 
-  const handleSubmit = (event: FormEvent) => {
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
+    const form = new FormData(event.currentTarget)
+    const field = (name: keyof Credentials) => String(form.get(name)).trim()
     authStore.login({
-      idInstance: idInstance.trim(),
-      apiTokenInstance: apiTokenInstance.trim(),
+      idInstance: field('idInstance'),
+      apiTokenInstance: field('apiTokenInstance'),
     })
   }
 
@@ -32,22 +33,11 @@ export const LoginPage = observer(() => {
         )}
 
         <FormItem top="idInstance" htmlFor="idInstance">
-          <Input
-            id="idInstance"
-            value={idInstance}
-            onChange={(e) => setIdInstance(e.target.value)}
-            required
-          />
+          <Input id="idInstance" name="idInstance" required />
         </FormItem>
 
         <FormItem top="apiTokenInstance" htmlFor="apiTokenInstance">
-          <Input
-            id="apiTokenInstance"
-            type="password"
-            value={apiTokenInstance}
-            onChange={(e) => setApiTokenInstance(e.target.value)}
-            required
-          />
+          <Input id="apiTokenInstance" name="apiTokenInstance" type="password" required />
         </FormItem>
 
         <FormItem>

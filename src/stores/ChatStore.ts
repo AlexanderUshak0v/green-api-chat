@@ -1,11 +1,15 @@
 import { makeAutoObservable, runInAction } from 'mobx'
 import type { NotificationDto } from '@/api/green-api/receiving/receiveNotification'
 import { sendMessage } from '@/api/green-api/sending/sendMessage'
+import { checkAccount } from '@/api/green-api/service/checkAccount'
 import type { Chat } from '@/models/Chat'
+import { normalizePhone } from '@/utils/phone'
 
 export class ChatStore {
   chats: Chat[] = []
-  selectedPhone: string | null = null
+  selectedChatId: string | null = null
+  isOpening = false
+  openError = ''
   isSending = false
   sendError = ''
   isOnline = true
@@ -15,18 +19,42 @@ export class ChatStore {
   }
 
   get selectedChat() {
-    return this.chats.find((chat) => chat.phone === this.selectedPhone) ?? null
+    return this.chats.find((chat) => chat.chatId === this.selectedChatId) ?? null
   }
 
-  openChat(phone: string) {
-    if (!this.chats.some((chat) => chat.phone === phone)) {
-      this.chats.unshift({ phone, telegramId: null, messages: [] })
+  async openChat(input: string) {
+    const phone = normalizePhone(input)
+    if (!phone) {
+      this.openError = 'Некорректный номер'
+      return false
     }
-    this.selectChat(phone)
+
+    this.openError = ''
+    const existing = this.chats.find((chat) => chat.phone === phone)
+    if (existing) {
+      this.selectChat(existing.chatId)
+      return true
+    }
+
+    this.isOpening = true
+    const chatId = await checkAccount(phone).catch(() => undefined)
+
+    runInAction(() => {
+      this.isOpening = false
+      if (chatId === undefined) {
+        this.openError = 'Не удалось проверить номер'
+      } else if (chatId === null) {
+        this.openError = 'Аккаунт Telegram с этим номером не найден'
+      } else {
+        this.chats.unshift({ chatId, phone, messages: [] })
+        this.selectChat(chatId)
+      }
+    })
+    return Boolean(chatId)
   }
 
-  selectChat(phone: string | null) {
-    this.selectedPhone = phone
+  selectChat(chatId: string | null) {
+    this.selectedChatId = chatId
     this.sendError = ''
   }
 
@@ -36,7 +64,9 @@ export class ChatStore {
 
   clear() {
     this.chats = []
-    this.selectedPhone = null
+    this.selectedChatId = null
+    this.openError = ''
+    this.sendError = ''
   }
 
   async sendMessage(text: string) {
@@ -48,54 +78,30 @@ export class ChatStore {
     this.isSending = true
     this.sendError = ''
 
-    try {
-      const chatId = chat.telegramId ?? `${chat.phone}@c.us`
-      const id = await sendMessage(chatId, text)
-      runInAction(() => {
-        chat.messages.push({ id, text, isOutgoing: true, timestamp: Date.now() / 1000 })
-      })
-      return true
-    } catch {
-      runInAction(() => {
+    const id = await sendMessage(chat.chatId, text).catch(() => null)
+
+    runInAction(() => {
+      this.isSending = false
+      if (id === null) {
         this.sendError = 'Не удалось отправить сообщение'
-      })
-      return false
-    } finally {
-      runInAction(() => {
-        this.isSending = false
-      })
-    }
+      } else {
+        chat.messages.push({ id, text, isOutgoing: true, timestamp: Date.now() / 1000 })
+      }
+    })
+    return id !== null
   }
 
   handleNotification({ body }: NotificationDto) {
     const { typeWebhook, idMessage, timestamp, senderData, messageData } = body
-    if (!senderData) {
-      return
-    }
-
-    // Эхо нашей отправки — из него узнаём Telegram ID собеседника
-    if (typeWebhook === 'outgoingAPIMessageReceived') {
-      const chat = this.chats.find((c) => c.messages.some((m) => m.id === idMessage))
-      if (chat) {
-        chat.telegramId = senderData.chatId
-      }
-      return
-    }
-
     if (typeWebhook !== 'incomingMessageReceived') {
       return
     }
 
-    // Telegram присылает номер, только если собеседник его не скрыл, поэтому сначала ищем по ID
-    const chat =
-      this.chats.find((c) => c.telegramId === senderData.chatId) ??
-      this.chats.find((c) => c.phone === String(senderData.senderPhoneNumber))
-
+    const chat = this.chats.find((c) => c.chatId === senderData?.chatId)
     if (!chat || chat.messages.some((m) => m.id === idMessage)) {
       return
     }
 
-    chat.telegramId = senderData.chatId
     const text =
       messageData?.textMessageData?.textMessage ??
       messageData?.extendedTextMessageData?.text ??

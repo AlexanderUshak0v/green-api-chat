@@ -1,18 +1,24 @@
 import { describe, expect, it, vi } from 'vitest'
 import type { NotificationDto } from '@/api/green-api/receiving/receiveNotification'
 import { sendMessage } from '@/api/green-api/sending/sendMessage'
+import { checkAccount } from '@/api/green-api/service/checkAccount'
 import { ChatStore } from './ChatStore'
 
 vi.mock('@/api/green-api/sending/sendMessage', () => ({
   sendMessage: vi.fn().mockResolvedValue('out-1'),
 }))
 
-const PHONE = '79124434049'
-const TELEGRAM_ID = '10000000'
+vi.mock('@/api/green-api/service/checkAccount', () => ({
+  checkAccount: vi.fn(),
+}))
 
-const createStore = () => {
+const PHONE = '79124434049'
+const CHAT_ID = '10000000'
+
+const createStore = async () => {
+  vi.mocked(checkAccount).mockResolvedValue(CHAT_ID)
   const store = new ChatStore()
-  store.openChat(PHONE)
+  await store.openChat(PHONE)
   return store
 }
 
@@ -22,73 +28,68 @@ const notification = (body: Partial<NotificationDto['body']>): NotificationDto =
     typeWebhook: 'incomingMessageReceived',
     idMessage: 'in-1',
     timestamp: 1700000000,
-    senderData: { chatId: TELEGRAM_ID },
+    senderData: { chatId: CHAT_ID },
     messageData: { typeMessage: 'textMessage', textMessageData: { textMessage: 'Привет' } },
     ...body,
   },
 })
 
-const fromPhone = (phone = PHONE, chatId = TELEGRAM_ID) =>
-  notification({ senderData: { chatId, senderPhoneNumber: Number(phone) } })
-
 describe('ChatStore', () => {
-  it('отправляет по номеру, пока Telegram ID неизвестен', async () => {
-    const store = createStore()
+  it('открывает чат с chatId, который вернул checkAccount', async () => {
+    const store = await createStore()
+
+    expect(checkAccount).toHaveBeenCalledWith(PHONE)
+    expect(store.selectedChat?.chatId).toBe(CHAT_ID)
+  })
+
+  it('не открывает чат, если аккаунт Telegram не найден', async () => {
+    vi.mocked(checkAccount).mockResolvedValue(null)
+    const store = new ChatStore()
+
+    await store.openChat(PHONE)
+
+    expect(store.openError).not.toBe('')
+    expect(store.chats).toHaveLength(0)
+  })
+
+  it('отправляет сообщение по chatId', async () => {
+    const store = await createStore()
 
     await store.sendMessage('Привет')
 
-    expect(sendMessage).toHaveBeenCalledWith(`${PHONE}@c.us`, 'Привет')
+    expect(sendMessage).toHaveBeenCalledWith(CHAT_ID, 'Привет')
     expect(store.selectedChat?.messages).toHaveLength(1)
   })
 
-  it('узнаёт Telegram ID из эха отправки и находит по нему ответ без номера', async () => {
-    const store = createStore()
-    await store.sendMessage('Привет')
+  it('добавляет входящее сообщение в чат собеседника', async () => {
+    const store = await createStore()
 
-    store.handleNotification(
-      notification({ typeWebhook: 'outgoingAPIMessageReceived', idMessage: 'out-1' }),
-    )
     store.handleNotification(notification({}))
 
-    expect(store.selectedChat?.telegramId).toBe(TELEGRAM_ID)
-    expect(store.selectedChat?.messages.map((m) => m.text)).toEqual(['Привет', 'Привет'])
+    expect(store.selectedChat?.messages.map((m) => m.text)).toEqual(['Привет'])
   })
 
-  it('находит чат по номеру, если Telegram ID ещё неизвестен', () => {
-    const store = createStore()
-
-    store.handleNotification(fromPhone())
-
-    expect(store.selectedChat?.messages).toHaveLength(1)
-    expect(store.selectedChat?.telegramId).toBe(TELEGRAM_ID)
-  })
-
-  it('не задваивает повторно доставленное сообщение', () => {
-    const store = createStore()
-    store.handleNotification(fromPhone())
-    store.handleNotification(fromPhone())
+  it('не задваивает повторно доставленное сообщение', async () => {
+    const store = await createStore()
+    store.handleNotification(notification({}))
+    store.handleNotification(notification({}))
 
     expect(store.selectedChat?.messages).toHaveLength(1)
   })
 
-  it('игнорирует сообщения от собеседников без чата', () => {
-    const store = createStore()
+  it('игнорирует сообщения от собеседников без чата', async () => {
+    const store = await createStore()
 
-    store.handleNotification(fromPhone('79990000000', '555'))
+    store.handleNotification(notification({ senderData: { chatId: '555' } }))
 
     expect(store.chats).toHaveLength(1)
     expect(store.selectedChat?.messages).toHaveLength(0)
   })
 
-  it('сохраняет не текстовое сообщение без текста', () => {
-    const store = createStore()
+  it('сохраняет не текстовое сообщение без текста', async () => {
+    const store = await createStore()
 
-    store.handleNotification(
-      notification({
-        senderData: { chatId: TELEGRAM_ID, senderPhoneNumber: Number(PHONE) },
-        messageData: { typeMessage: 'imageMessage' },
-      }),
-    )
+    store.handleNotification(notification({ messageData: { typeMessage: 'imageMessage' } }))
 
     expect(store.selectedChat?.messages[0].text).toBeNull()
   })

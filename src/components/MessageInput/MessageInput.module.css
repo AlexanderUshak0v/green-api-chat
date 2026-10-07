@@ -1,0 +1,11 @@
+.form {
+  flex-shrink: 0;
+  padding: 0 var(--chat-gutter) 16px;
+}
+
+.field {
+  --vkui--size_field_height--regular: 40px;
+  --vkui--size_field_height--compact: 40px;
+  --vkui--size_border_radius--regular: 12px;
+  font-size: 16px;
+}

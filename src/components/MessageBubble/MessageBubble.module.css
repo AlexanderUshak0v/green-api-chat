@@ -1,10 +1,14 @@
 .bubble {
+  position: relative;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  width: fit-content;
   max-width: 70%;
-  padding: 8px 12px 6px;
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
+  padding: 6px 10px 8px;
   color: var(--vkui--color_text_primary);
-  border-radius: 16px;
+  border-radius: 18px;
+  font-size: 14px;
+  line-height: 20px;
 }
 
 .incoming {
@@ -15,9 +19,59 @@
 
 .outgoing {
   align-self: flex-end;
-  color: var(--vkui--color_text_contrast);
-  background: var(--vkui--color_background_accent);
+  color: var(--green-text);
+  background: var(--green-message-outgoing);
   border-bottom-right-radius: 4px;
+}
+
+.joinsPrevious {
+  margin-top: -6px;
+}
+
+.outgoing.joinsPrevious {
+  border-top-right-radius: 4px;
+}
+
+.incoming.joinsPrevious {
+  border-top-left-radius: 4px;
+}
+
+.outgoing.tail {
+  border-bottom-right-radius: 0;
+}
+
+.incoming.tail {
+  border-bottom-left-radius: 0;
+}
+
+.tail::after {
+  position: absolute;
+  bottom: 0;
+  width: 10px;
+  height: 16px;
+  background: inherit;
+  content: '';
+  clip-path: path('M 0 0 L 2 0 C 2 9 4 13 9 15 Q 10 15.5 9 16 L 0 16 Z');
+}
+
+.outgoing.tail::after {
+  right: -8px;
+}
+
+.incoming.tail::after {
+  left: -8px;
+  transform: scaleX(-1);
+}
+
+.text {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.text::after {
+  display: inline-block;
+  width: 38px;
+  content: '';
 }
 
 .unsupported {
@@ -26,8 +80,11 @@
 }
 
 .time {
-  float: right;
-  margin: 6px 0 0 12px;
+  position: absolute;
+  right: 10px;
+  bottom: 5px;
   font-size: 11px;
-  opacity: 0.6;
+  line-height: 12px;
+  white-space: nowrap;
+  opacity: 0.7;
 }
