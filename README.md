@@ -13,8 +13,8 @@
 На телефоне список чатов и переписка открываются отдельными экранами:
 
 <p>
-  <img src="screenshots/mobile-list.png" alt="Список чатов на телефоне" height="520" />
-  <img src="screenshots/mobile-chat.png" alt="Переписка на телефоне" height="520" />
+  <img src="screenshots/mobile-list.png" alt="Список чатов на телефоне" height="478" />
+  <img src="screenshots/mobile-chat.png" alt="Переписка на телефоне" height="478" />
 </p>
 
 Вход по данным инстанса:
