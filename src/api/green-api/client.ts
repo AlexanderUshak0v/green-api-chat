@@ -1,14 +1,16 @@
 import axios from 'axios'
 import type { Credentials } from '@/models/Credentials'
 
-const API_URL = 'https://api.green-api.com'
+// У каждого инстанса свой apiUrl: хост — первые 4 цифры idInstance,
+// например 4100.api.green-api.com для 410022759180
+const apiUrl = (idInstance: string) => `https://${idInstance.slice(0, 4)}.api.green-api.com`
 
 export const greenApi = axios.create({ timeout: 15_000 })
 
 let token = ''
 
 export const setCredentials = ({ idInstance, apiTokenInstance }: Credentials) => {
-  greenApi.defaults.baseURL = `${API_URL}/waInstance${idInstance}`
+  greenApi.defaults.baseURL = `${apiUrl(idInstance)}/waInstance${idInstance}`
   token = apiTokenInstance
 }
 
@@ -18,7 +20,7 @@ export const withToken = (method: string) => `/${method}/${token}`
 export const isUnauthorized = (error: unknown) =>
   axios.isAxiosError(error) && error.response?.status === 401
 
-// На несуществующий idInstance GREEN-API отвечает 403 без CORS-заголовков,
-// поэтому браузер не отдаёт ответ и axios видит ошибку без response
+// Для несуществующего idInstance хост apiUrl не отвечает,
+// поэтому axios видит сетевую ошибку без response
 export const isUnknownInstance = (error: unknown) =>
   axios.isAxiosError(error) && !error.response && navigator.onLine
