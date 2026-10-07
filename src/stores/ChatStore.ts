@@ -29,6 +29,10 @@ export class ChatStore {
       return false
     }
 
+    if (this.isOpening) {
+      return false
+    }
+
     this.openError = ''
     const existing = this.chats.find((chat) => chat.phone === phone)
     if (existing) {
@@ -71,7 +75,7 @@ export class ChatStore {
 
   async sendMessage(text: string) {
     const chat = this.selectedChat
-    if (!chat) {
+    if (!chat || this.isSending) {
       return false
     }
 

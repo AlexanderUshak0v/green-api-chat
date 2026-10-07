@@ -11,18 +11,22 @@ export const MessageInput = observer(() => {
   const [text, setText] = useState('')
   const message = text.trim()
 
-  const handleSubmit = async (event: FormEvent) => {
-    event.preventDefault()
+  const send = async () => {
     if (message && (await chatStore.sendMessage(message))) {
       setText('')
     }
   }
 
+  const handleSubmit = (event: FormEvent) => {
+    event.preventDefault()
+    send()
+  }
+
   // Enter отправляет, Shift+Enter переносит строку
-  const handleKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
+  const handleKeyDown = (event: KeyboardEvent) => {
     if (event.key === 'Enter' && !event.shiftKey) {
       event.preventDefault()
-      event.currentTarget.form?.requestSubmit()
+      send()
     }
   }
 
@@ -38,7 +42,6 @@ export const MessageInput = observer(() => {
         value={text}
         onChange={(e) => setText(e.target.value)}
         onKeyDown={handleKeyDown}
-        disabled={chatStore.isSending}
         after={
           message && (
             <IconButton type="submit" label="Отправить сообщение">

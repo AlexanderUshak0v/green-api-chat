@@ -24,7 +24,6 @@ export const NewChatForm = observer(() => {
           placeholder="Новый чат по номеру телефона"
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
-          disabled={chatStore.isOpening}
           after={
             phone.trim() && (
               <IconButton type="submit" label="Начать чат">
