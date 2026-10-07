@@ -15,7 +15,7 @@ import { useStore } from '@/stores/RootStoreContext'
 import { formatPhone } from '@/utils/phone'
 import styles from './ChatWindow.module.css'
 
-interface Props {
+type Props = {
   chat: Chat
 }
 

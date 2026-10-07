@@ -1,6 +1,6 @@
 import { makeAutoObservable, runInAction } from 'mobx'
-import type { NotificationDto } from '@/api/green-api/receiveNotification'
-import { sendMessage } from '@/api/green-api/sendMessage'
+import type { NotificationDto } from '@/api/green-api/receiving/receiveNotification'
+import { sendMessage } from '@/api/green-api/sending/sendMessage'
 import type { Chat } from '@/models/Chat'
 
 export class ChatStore {

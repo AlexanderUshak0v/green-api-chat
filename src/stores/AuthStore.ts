@@ -1,6 +1,6 @@
 import { makeAutoObservable, runInAction } from 'mobx'
 import { isUnauthorized, setCredentials } from '@/api/green-api/client'
-import { getStateInstance } from '@/api/green-api/getStateInstance'
+import { getStateInstance } from '@/api/green-api/account/getStateInstance'
 import type { Credentials } from '@/models/Credentials'
 
 const STORAGE_KEY = 'green-api-credentials'

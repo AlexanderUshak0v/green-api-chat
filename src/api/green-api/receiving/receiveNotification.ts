@@ -1,9 +1,9 @@
-import { greenApi, withToken } from './client'
+import { greenApi, withToken } from '../client'
 
 // Сколько секунд сервер ждёт новое уведомление, прежде чем вернуть null
 const RECEIVE_TIMEOUT = 20
 
-export interface NotificationDto {
+export type NotificationDto = {
   receiptId: number
   body: {
     typeWebhook: string

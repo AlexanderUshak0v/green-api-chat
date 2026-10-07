@@ -1,6 +1,6 @@
-import { greenApi, withToken } from './client'
+import { greenApi, withToken } from '../client'
 
-interface SendMessageDto {
+type SendMessageDto = {
   idMessage: string
 }
 

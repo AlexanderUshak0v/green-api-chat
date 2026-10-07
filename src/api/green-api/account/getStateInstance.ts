@@ -1,6 +1,6 @@
-import { greenApi, withToken } from './client'
+import { greenApi, withToken } from '../client'
 
-interface StateInstanceDto {
+type StateInstanceDto = {
   stateInstance: string
 }
 

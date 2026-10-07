@@ -1,10 +1,11 @@
 import { Icon24ArrowRightOutline } from '@vkontakte/icons'
 import { FormItem, IconButton, Input } from '@vkontakte/vkui'
+import { observer } from 'mobx-react-lite'
 import { useState, type FormEvent } from 'react'
 import { useStore } from '@/stores/RootStoreContext'
 import { normalizePhone } from '@/utils/phone'
 
-export const NewChatForm = () => {
+export const NewChatForm = observer(() => {
   const { chatStore } = useStore()
   const [phone, setPhone] = useState('')
   const [error, setError] = useState('')
@@ -40,4 +41,4 @@ export const NewChatForm = () => {
       </FormItem>
     </form>
   )
-}
+})

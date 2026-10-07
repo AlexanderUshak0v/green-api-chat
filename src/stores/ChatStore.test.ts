@@ -1,9 +1,9 @@
 import { describe, expect, it, vi } from 'vitest'
-import type { NotificationDto } from '@/api/green-api/receiveNotification'
-import { sendMessage } from '@/api/green-api/sendMessage'
+import type { NotificationDto } from '@/api/green-api/receiving/receiveNotification'
+import { sendMessage } from '@/api/green-api/sending/sendMessage'
 import { ChatStore } from './ChatStore'
 
-vi.mock('@/api/green-api/sendMessage', () => ({
+vi.mock('@/api/green-api/sending/sendMessage', () => ({
   sendMessage: vi.fn().mockResolvedValue('out-1'),
 }))
 

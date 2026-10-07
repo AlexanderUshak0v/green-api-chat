@@ -1,40 +1,40 @@
 import { isUnauthorized } from '@/api/green-api/client'
-import { deleteNotification } from '@/api/green-api/deleteNotification'
-import { receiveNotification } from '@/api/green-api/receiveNotification'
+import { deleteNotification } from '@/api/green-api/receiving/deleteNotification'
+import { receiveNotification } from '@/api/green-api/receiving/receiveNotification'
 import type { AuthStore } from '@/stores/AuthStore'
 import type { ChatStore } from '@/stores/ChatStore'
 
 const RETRY_DELAY = 5_000
 
 export class NotificationService {
-  private chatStore: ChatStore
-  private authStore: AuthStore
-  private controller: AbortController | null = null
+  private _chatStore: ChatStore
+  private _authStore: AuthStore
+  private _controller: AbortController | null = null
 
   constructor(chatStore: ChatStore, authStore: AuthStore) {
-    this.chatStore = chatStore
-    this.authStore = authStore
+    this._chatStore = chatStore
+    this._authStore = authStore
   }
 
   start() {
     this.stop()
-    this.controller = new AbortController()
-    this.poll(this.controller.signal)
+    this._controller = new AbortController()
+    this._poll(this._controller.signal)
   }
 
   stop() {
-    this.controller?.abort()
-    this.controller = null
+    this._controller?.abort()
+    this._controller = null
   }
 
-  private async poll(signal: AbortSignal) {
+  private async _poll(signal: AbortSignal) {
     while (!signal.aborted) {
       try {
         const notification = await receiveNotification(signal)
-        this.chatStore.setOnline(true)
+        this._chatStore.setOnline(true)
 
         if (notification) {
-          this.chatStore.handleNotification(notification)
+          this._chatStore.handleNotification(notification)
           await deleteNotification(notification.receiptId)
         }
       } catch (error) {
@@ -42,10 +42,10 @@ export class NotificationService {
           return
         }
         if (isUnauthorized(error)) {
-          this.authStore.logout('Сессия недействительна, войдите заново')
+          this._authStore.logout('Сессия недействительна, войдите заново')
           return
         }
-        this.chatStore.setOnline(false)
+        this._chatStore.setOnline(false)
         await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY))
       }
     }

@@ -1,11 +1,11 @@
 import { Placeholder } from '@vkontakte/vkui'
 import { observer } from 'mobx-react-lite'
 import { useEffect, useRef } from 'react'
+import { MessageBubble } from '@/components/MessageBubble/MessageBubble'
 import type { Message } from '@/models/Message'
-import { formatTime } from '@/utils/time'
 import styles from './MessageList.module.css'
 
-interface Props {
+type Props = {
   messages: Message[]
 }
 
@@ -21,15 +21,7 @@ export const MessageList = observer(({ messages }: Props) => {
       {messages.length === 0 && <Placeholder stretched>Сообщений пока нет</Placeholder>}
 
       {messages.map((message) => (
-        <div
-          key={message.id}
-          className={`${styles.message} ${message.isOutgoing ? styles.outgoing : styles.incoming}`}
-        >
-          {message.text ?? (
-            <span className={styles.unsupported}>Сообщение этого типа не поддерживается</span>
-          )}
-          <time className={styles.time}>{formatTime(message.timestamp)}</time>
-        </div>
+        <MessageBubble key={message.id} message={message} />
       ))}
 
       <div ref={bottomRef} />
